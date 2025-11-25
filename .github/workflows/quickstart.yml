@@ -1,0 +1,101 @@
+name: Quickstart CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  quickstart:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.10']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}-${{ matrix.python-version }}
+        restore-keys: |
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
+          ${{ runner.os }}-pip-
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libjpeg-dev zlib1g-dev libpng-dev libwebp-dev
+    
+    - name: Install Python dependencies
+      run: |
+        pip install -r requirements.txt
+    
+    - name: Quick training run
+      env:
+        NUM_EPOCHS: 1
+        CI: "true"
+      run: |
+        make train
+    
+    - name: Verify model files
+      run: |
+        test -f models/caption_model.pth || (echo "Model file not created" && exit 1)
+        test -f models/vocab.pkl || (echo "Vocabulary file not created" && exit 1)
+        ls -lh models/
+    
+    - name: Run smoke tests
+      run: |
+        make test
+    
+    - name: Test model loading directly
+      run: |
+        cat > test_model.py << 'EOF'
+        import sys
+        sys.path.append('app')
+        from model_loader import get_model_loader
+        try:
+            loader = get_model_loader()
+            print('✅ Model loads successfully')
+            print(f'Vocabulary size: {len(loader.vocab)}')
+            print(f'Device: {loader.device}')
+        except Exception as e:
+            print(f'❌ Model loading failed: {e}')
+            exit(1)
+        EOF
+        python test_model.py
+
+  lint-format:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install linting tools
+      run: |
+        pip install black flake8 isort
+    
+    - name: Check code formatting
+      run: |
+        black --check app/ training/ test_api.py
+        isort --check-only app/ training/ test_api.py
+    
+    - name: Run linting
+      run: |
+        flake8 app/ training/ test_api.py --max-line-length=100 --ignore=E203,W503

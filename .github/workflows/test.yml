@@ -1,0 +1,146 @@
+name: Test Image Captioning API
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-cpu:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements-cpu.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements-cpu.txt
+    
+    - name: Create sample model for testing
+      run: |
+        mkdir -p models
+        python -c "
+import torch
+import pickle
+from pathlib import Path
+
+# Create a minimal vocabulary for testing
+class Vocabulary:
+    def __init__(self):
+        self.itos = {0: '<PAD>', 1: '<SOS>', 2: '<EOS>', 3: '<UNK>', 4: 'a', 5: 'dog', 6: 'cat', 7: 'red', 8: 'blue', 9: 'image'}
+        self.stoi = {v: k for k, v in self.itos.items()}
+    
+    def __len__(self):
+        return len(self.itos)
+
+# Save vocabulary
+with open('models/vocab.pkl', 'wb') as f:
+    pickle.dump(Vocabulary(), f)
+
+# Create a minimal model checkpoint
+checkpoint = {
+    'model_state_dict': {},  # Empty state dict for testing
+    'embed_size': 256,
+    'hidden_size': 512
+}
+torch.save(checkpoint, 'models/caption_model.pth')
+print('Test model files created')
+"
+    
+    - name: Run linting (if available)
+      run: |
+        pip install flake8 black || true
+        black --check app/ training/ test_api.py || echo "Black formatting check skipped"
+        flake8 app/ training/ test_api.py || echo "Linting check skipped"
+      continue-on-error: true
+    
+    - name: Build CPU Docker image
+      run: |
+        docker build -f Dockerfile.cpu -t image-caption-api:test .
+    
+    - name: Start API container
+      run: |
+        docker run -d --name caption-api-test -p 8000:8000 image-caption-api:test
+        sleep 15  # Wait for startup
+    
+    - name: Test API endpoints
+      run: |
+        # Install test dependencies
+        pip install requests
+        
+        # Wait for health check
+        timeout 60 bash -c 'until curl -f http://localhost:8000/health; do sleep 2; done'
+        
+        # Run smoke tests
+        python test_api.py
+    
+    - name: Docker container logs
+      if: always()
+      run: |
+        docker logs caption-api-test
+    
+    - name: Cleanup
+      if: always()
+      run: |
+        docker stop caption-api-test || true
+        docker rm caption-api-test || true
+
+  test-training:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+    
+    - name: Test training script
+      env:
+        NUM_EPOCHS: 1
+        CI: "true"
+      run: |
+        cd training
+        python train.py
+    
+    - name: Verify model files created
+      run: |
+        test -f models/caption_model.pth || (echo "Model file not created" && exit 1)
+        test -f models/vocab.pkl || (echo "Vocabulary file not created" && exit 1)
+        echo "✅ Training script works correctly"
+    
+    - name: Test model loading
+      run: |
+        python -c "
+import sys
+sys.path.append('app')
+from model_loader import get_model_loader
+try:
+    loader = get_model_loader()
+    print('✅ Model loads successfully')
+except Exception as e:
+    print(f'❌ Model loading failed: {e}')
+    exit(1)
+"

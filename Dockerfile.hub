@@ -1,0 +1,53 @@
+# Multi-stage Dockerfile optimized for Docker Hub publishing
+# Targets: cpu (default) and gpu (via BUILD_GPU=true)
+
+FROM python:3.11-slim AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+# System deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpng-dev \
+    libwebp-dev \
+    curl \
+  && rm -rf /var/lib/apt/lists/*
+
+# ---- Build stage (install deps) ----
+FROM base AS builder
+COPY requirements-cpu.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ---- Runtime stage ----
+FROM base AS runtime
+
+# Create non-root user
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+
+# Copy virtual env/site-packages from builder
+COPY --from=builder /usr/local/lib/python3.11 /usr/local/lib/python3.11
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# App code
+COPY app ./app
+COPY models ./models
+
+# Optional GPU enablement
+ARG BUILD_GPU=false
+RUN if [ "$BUILD_GPU" = "true" ]; then \
+    pip uninstall -y torch torchvision && \
+    pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cu118; \
+    fi
+
+USER appuser
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
