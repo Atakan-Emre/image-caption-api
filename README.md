@@ -6,7 +6,25 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://docker.com)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
+PyTorch, FastAPI ve modern MLOps pratikleri kullanılarak geliştirilmiş, **production-ready bir görüntü başlıklandırma (image captioning) servisi**. Tek bir HTTP isteğiyle görseli API’ye gönderip, insan benzeri açıklayıcı bir metin çıktısı almanızı sağlar.
+
+Bu proje, *"model dosyasını bir yere koyduk, gerisi gelsin"* yaklaşımından öteye geçip, **uçtan uca bir çözüm** sunar:
+
+- Model tarafında: ResNet50 tabanlı encoder + LSTM decoder (attention destekli) mimarisi  
+- API tarafında: FastAPI ile async REST endpoint’leri, validasyon, hata yönetimi  
+- DevOps tarafında: Docker tabanlı container’lar, Makefile ile otomasyon, GitHub Actions ile CI/CD pipeline’ı
+
+Gerçek hayatta şu senaryolara gömülebilir:
+
+- ♿ **Erişilebilirlik**: Görme engelli kullanıcılar için otomatik alt-text üretimi  
+- 🛒 **E-ticaret**: Ürün görsellerinden otomatik başlık / açıklama oluşturma  
+- 📰 **İçerik Yönetimi**: Haber, blog veya medya platformlarında görselleri otomatik etiketleme ve açıklama  
+- 📷 **Fotoğraf Arşivi**: Kişisel veya kurumsal fotoğraf arşivleri için arama yapılabilir metinsel açıklamalar üretme  
+
+Hem **örnek bir küçük dataset ile hızlı deneme** yapabileceğin, hem de **tam COCO veri seti ile büyük ölçekli eğitim** yürütebileceğin şekilde tasarlandı. Eğitim, çıkarım (inference), Docker build, test ve deployment adımlarının tamamı Makefile komutları ve CI/CD pipeline’ı ile otomatikleştirilebilir.
+
 PyTorch, FastAPI ve modern ML pratikleri ile oluşturulmuş production-ready görüntü başlıklandırma API'si. Hem örnek eğitim hem de tam COCO veri seti eğitimini kapsamlı CI/CD pipeline ile destekler.
+
 
 ## ✨ Özellikler
 
