@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+.github
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints
+
+# IDE
+.vscode
+.idea
+
+# Project Specific
+training/sample_images/
+training/sample_captions.json
+.api_server.pid
+tests/
+scripts/
+Makefile
+README.md
+DOCKER_HUB.md
+task.md
+project_analysis.md

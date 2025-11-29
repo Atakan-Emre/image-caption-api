@@ -3,7 +3,8 @@
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.1.0-red)](https://pytorch.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-green)](https://fastapi.tiangolo.com)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://docker.com)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://hub.docker.com/r/atakanemree/image-caption-api)
+[![Docker Pulls](https://img.shields.io/docker/pulls/atakanemree/image-caption-api)](https://hub.docker.com/r/atakanemree/image-caption-api)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 PyTorch, FastAPI ve modern MLOps pratikleri kullanılarak geliştirilmiş, **production-ready bir görüntü başlıklandırma (image captioning) servisi**. Tek bir HTTP isteğiyle görseli API’ye gönderip, insan benzeri açıklayıcı bir metin çıktısı almanızı sağlar.
@@ -258,9 +259,11 @@ make docker-test
 ### Docker Hub Deployment
 ```bash
 # Docker Hub'a tag'le ve pushla
-docker tag image-caption-api:cpu yourusername/image-caption-api:latest
-docker push yourusername/image-caption-api:latest
+docker tag image-caption-api:cpu atakanemree/image-caption-api:latest
+docker push atakanemree/image-caption-api:latest
 ```
+
+Docker Hub Linki: [https://hub.docker.com/r/atakanemree/image-caption-api](https://hub.docker.com/r/atakanemree/image-caption-api)
 
 ## 🧪 Test
 
@@ -438,7 +441,7 @@ Bu proje MIT Lisansı altında lisanslanmıştır - [LICENSE](LICENSE) dosyasın
 - 📧 Email: support@example.com
 - 💬 Discord: [Topluluğumuza katılın](https://discord.gg/example)
 - 📖 Dokümantasyon: [Tam dokümanlar](https://docs.example.com)
-- 🐛 Sorunlar: [GitHub Issues](https://github.com/example/issues)
+- 🐛 Sorunlar: [GitHub Issues](https://github.com/Atakan-Emre/image-caption-api/issues)
 
 ---
 

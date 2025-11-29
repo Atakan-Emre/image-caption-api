@@ -1,7 +1,7 @@
 .PHONY: help install install-coco train train-coco run test download-coco preprocess-coco setup-coco quick-start quick-start-coco build build-cpu build-gpu build-all build-hub-cpu build-hub-gpu build-hub-all push-hub docker-run docker-run-gpu docker-stop docker-test clean format lint
 
 REGISTRY ?= docker.io
-DOCKER_IMAGE ?= $(REGISTRY)/image-caption-api
+DOCKER_IMAGE ?= atakanemree/image-caption-api
 
 # Default target
 help:

@@ -140,5 +140,3 @@ training/sample_captions.json
 .DS_Store
 Thumbs.db
 
-# Docker
-.dockerignore

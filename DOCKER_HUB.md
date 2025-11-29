@@ -14,7 +14,7 @@ Bu rehber, Image Captioning API'sini Docker Hub'a otomatik CI/CD pipeline ile da
 
 1. **Docker Hub Repository Oluştur**
    ```bash
-   # Docker Hub'da repository oluştur: yourusername/image-caption-api
+   # Docker Hub'da repository oluştur: atakanemree/image-caption-api
    # İhtiyacınıza göre Public veya Private olarak ayarla
    ```
 
@@ -30,7 +30,7 @@ Bu rehber, Image Captioning API'sini Docker Hub'a otomatik CI/CD pipeline ile da
 Bu secret'ları GitHub repository'nize ekleyin:
 
 ```bash
-DOCKER_USERNAME=your_dockerhub_username
+DOCKER_USERNAME=atakanemree
 DOCKER_PASSWORD=your_dockerhub_access_token
 ```
 
@@ -42,7 +42,7 @@ Aşağıdaki dosyaları bilgilerinizle güncelleyin:
 ```yaml
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: yourusername/image-caption-api  # Bunu güncelleyin
+  IMAGE_NAME: atakanemree/image-caption-api  # Bunu güncelleyin
 ```
 
 **`Dockerfile.hub`:**
@@ -69,12 +69,12 @@ Pipeline otomatik olarak tetiklenir:
    make build-hub-gpu
    
    # Docker Hub için tag'le
-   docker tag image-caption-api:cpu yourusername/image-caption-api:latest-cpu
-   docker tag image-caption-api:gpu yourusername/image-caption-api:latest-gpu
+   docker tag image-caption-api:cpu atakanemree/image-caption-api:latest-cpu
+   docker tag image-caption-api:gpu atakanemree/image-caption-api:latest-gpu
    
    # Docker Hub'a pushla
-   docker push yourusername/image-caption-api:latest-cpu
-   docker push yourusername/image-caption-api:latest-gpu
+   docker push atakanemree/image-caption-api:latest-cpu
+   docker push atakanemree/image-caption-api:latest-gpu
    ```
 
 2. **Versioned Release**
