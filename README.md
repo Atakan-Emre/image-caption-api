@@ -438,9 +438,7 @@ Bu proje MIT Lisansı altında lisanslanmıştır - [LICENSE](LICENSE) dosyasın
 
 ## 📞 Destek
 
-- 📧 Email: support@example.com
-- 💬 Discord: [Topluluğumuza katılın](https://discord.gg/example)
-- 📖 Dokümantasyon: [Tam dokümanlar](https://docs.example.com)
+- 📧 Email: satakanemre@gmail.com
 - 🐛 Sorunlar: [GitHub Issues](https://github.com/Atakan-Emre/image-caption-api/issues)
 
 ---
